@@ -4,7 +4,7 @@ import { LinkOption, MenuTabOption, SubMenuOption } from "../page-object-model/c
 import { SortByOption } from "../page-object-model/pages/ProductsPage";
 
 test.beforeEach(async ({ page, homePage }) => {
-  await page.goto('https://demowebshop.tricentis.com/');
+  await page.goto('/');
   await homePage.verifyHomePageIsDisplayed();
 });
 
@@ -55,6 +55,7 @@ test('Verify Filter is applied on Products page', async ({ header, productsPage 
 });
 
 test('Verify search for product and redirect to product details page', async ({ header, productDetailsPage }) => {
-  await header.searchForProduct('Build your own expensive');
-  await productDetailsPage.verifyCorrectTitle('Build your own expensive');
+  const productName = ('Build your own expensive');
+  await header.searchForProduct(productName);
+  await productDetailsPage.verifyCorrectTitle(productName);
 })
