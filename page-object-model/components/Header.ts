@@ -36,6 +36,8 @@ export class Header extends BasePage {
     private readonly searchInput: Locator;
     private readonly searchSuggestions: Locator;
 
+    private readonly cartQuantity: Locator;
+
     constructor(page: Page) {
         super(page)
 
@@ -47,6 +49,8 @@ export class Header extends BasePage {
         this.searchSuggestions = page.locator('.ui-autocomplete .ui-menu-item');
 
         this.menuTabs = page.locator('.header-menu li');
+
+        this.cartQuantity = page.locator('.cart-qty')
 
     }
 
@@ -74,5 +78,7 @@ export class Header extends BasePage {
         await this.searchSuggestions.first().click();
     }
 
-
+    async verifyCartQuantity(quantity: number) {
+        await expect(this.cartQuantity).toContainText(`(${quantity})`);
+    }
 }

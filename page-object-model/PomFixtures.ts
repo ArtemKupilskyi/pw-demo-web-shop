@@ -8,6 +8,8 @@ import { ComparePage } from "./pages/ComparePage";
 import { AccountNavigation } from "./components/AccountNavigation";
 import { InfoPage } from "./pages/customer/InfoPage";
 import { AddressesPage } from "./pages/customer/AddressesPage";
+import { CartPage } from "./pages/CartPage";
+import { CheckoutPage } from "./pages/CheckoutPage";
 
 type MyFixtures = {
     header: Header;
@@ -19,6 +21,8 @@ type MyFixtures = {
     accountNavigation: AccountNavigation;
     infoPage: InfoPage;
     addressesPage: AddressesPage;
+    cartPage: CartPage;
+    checkoutPage: CheckoutPage;
 }
 
 export const test = baseTest.extend<MyFixtures>({
@@ -48,5 +52,11 @@ export const test = baseTest.extend<MyFixtures>({
     },
     addressesPage: async ({ page }, use) => {
         await use(new AddressesPage(page));
+    },
+    cartPage: async ({ page }, use) => {
+        await use(new CartPage(page));
+    },
+    checkoutPage: async ({ page }, use) => {
+        await use(new CheckoutPage(page));
     },
 });

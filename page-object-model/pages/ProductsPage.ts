@@ -11,11 +11,16 @@ export enum SortByOption {
 }
 
 export class ProductsPage extends BasePage {
+    private readonly productGrid: Locator;
+    private readonly productList: Locator;
+
     private readonly resultCountFilter: Locator;
+    private readonly viewFilter: Locator;
     private readonly sortByFilter: Locator;
 
     private readonly productCards: Locator;
     private readonly price: Locator;
+    private readonly title: Locator;
 
     private readonly filterContainer: Locator;
     private readonly filterLinks: Locator;
@@ -23,11 +28,16 @@ export class ProductsPage extends BasePage {
     constructor(page: Page) {
         super(page);
 
+        this.productGrid = page.locator('.product-grid');
+        this.productList = page.locator('.product-list');
+
         this.resultCountFilter = page.locator('#products-pagesize');
+        this.viewFilter = page.locator('#products-viewmode');
         this.sortByFilter = page.locator('#products-orderby');
 
         this.productCards = page.locator('.item-box');
         this.price = this.productCards.locator('.actual-price');
+        this.title = this.productCards.locator('.product-title');
 
         this.filterContainer = page.locator('.product-filters');
         this.filterLinks = this.filterContainer.locator('li');
@@ -50,13 +60,44 @@ export class ProductsPage extends BasePage {
     async verifyProductsSortedByPrice(option: SortByOption) {
         const prices = await this.price.allTextContents();
         const numericPrices = prices.map(price => parseFloat(price));
+        const copyNumericPrices = numericPrices.slice();
 
-        const sortedPrices = numericPrices.sort((a, b) => a - b);
+        const sortedPrices = copyNumericPrices.sort((a, b) => a - b);
         if (option === SortByOption.PRICE_DESC) {
             sortedPrices.reverse();
         }
 
         expect(numericPrices).toEqual(sortedPrices);
+    }
+
+    async verifyProductsSortedByName(option: SortByOption) {
+        const titles = (await this.title.allTextContents()).map(t => t.trim());
+        const copyTitles = titles.slice();
+
+        const sortedTitles = copyTitles.sort();
+        if (option === SortByOption.NAME_DESC) {
+            sortedTitles.reverse();
+        }
+        expect(titles).toEqual(sortedTitles);
+    }
+
+    async setViewMode(viewMode: string) {
+        await this.viewFilter.selectOption(viewMode);
+    }
+
+    async verifyViewMode(viewMode: string) {
+        switch (viewMode) {
+            case 'Grid':
+                await expect(this.viewFilter.locator('option:checked')).toHaveText('Grid');
+                await expect(this.productGrid).toBeVisible();
+                break;
+            case 'List':
+                await expect(this.viewFilter.locator('option:checked')).toHaveText('List');
+                await expect(this.productList).toBeVisible();
+                break;
+            default:
+                throw new Error(`View mode verification not implemented for: ${viewMode}`);
+        }
     }
 
     async selectFilter(filterName: string) {
