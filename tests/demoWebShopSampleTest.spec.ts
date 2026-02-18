@@ -47,6 +47,22 @@ test('Verify Sort By price on Products page', async ({ header, productsPage }) =
   await productsPage.verifyProductsSortedByPrice(SortByOption.PRICE_DESC);
 });
 
+test('Verify Sort By name on Products page', async ({ header, productsPage }) => {
+  await header.goToSelectedMenuTab(MenuTabOption.COMPUTERS, SubMenuOption.DESKTOPS);
+  await productsPage.setSortByOption(SortByOption.NAME_ASC);
+  await productsPage.verifyProductsSortedByName(SortByOption.NAME_ASC);
+  await productsPage.setSortByOption(SortByOption.NAME_DESC);
+  await productsPage.verifyProductsSortedByName(SortByOption.NAME_DESC);
+});
+
+test('Verify View mode on Products page', async ({ header, productsPage }) => {
+  await header.goToSelectedMenuTab(MenuTabOption.COMPUTERS, SubMenuOption.DESKTOPS);
+  await productsPage.setViewMode('List');
+  await productsPage.verifyViewMode('List');
+  await productsPage.setViewMode('Grid');
+  await productsPage.verifyViewMode('Grid');
+});
+
 test('Verify Filter is applied on Products page', async ({ header, productsPage }) => {
   await header.goToSelectedMenuTab(MenuTabOption.COMPUTERS, SubMenuOption.DESKTOPS);
   await productsPage.selectFilter('Under 1000.00');

@@ -1,4 +1,6 @@
+import { fa, faker } from "@faker-js/faker";
 import { LinkOption } from "../page-object-model/components/Header";
+import { ShippingOption, PaymentOption } from "../page-object-model/pages/CheckoutPage";
 import { test } from "../page-object-model/PomFixtures";
 
 const productName = 'Build your own expensive';
@@ -103,7 +105,7 @@ test.describe('Cart management', () => {
 
 test.describe('Checkout workflow', () => {
 
-    test('Verify checkout workflow', async ({ header, loginPage, productDetailsPage, cartPage, checkoutPage }) => {
+    test.beforeEach(async ({ header, loginPage, productDetailsPage, cartPage, }) => {
         await header.goToSelectedLink(LinkOption.LOG_IN);
         await loginPage.login('test@emil.com', 'Testpassword');
         await header.verifyUserIsLoggedIn('test@emil.com');
@@ -114,8 +116,37 @@ test.describe('Checkout workflow', () => {
 
         await cartPage.acceptTermsOfService();
         await cartPage.goToCheckout();
+    })
 
+    test('Verify checkout workflow with default options', async ({ checkoutPage }) => {
         await checkoutPage.goThroughAllStepsWithDefaultValues();
+        await checkoutPage.verifyCheckoutCompleted();
+    });
+
+    test('Verify checkout workflow with selected options', async ({ checkoutPage }) => {
+        await checkoutPage.selectAddress();
+        await checkoutPage.goToTheNextStep();
+        await checkoutPage.selectAddress();
+        await checkoutPage.goToTheNextStep();
+        await checkoutPage.chooseShippingMethod(ShippingOption.NEXT_DAY_AIR);
+        await checkoutPage.goToTheNextStep();
+        await checkoutPage.choosePaymentMethod(PaymentOption.CREDIT_CARD);
+        await checkoutPage.goToTheNextStep();
+        await checkoutPage.fillPaymentInformation(
+            faker.helpers.arrayElement(['Visa', 'MasterCard', 'Discover', 'Amex']),
+            faker.person.fullName(),
+            faker.finance.creditCardNumber(),
+            faker.number.int({ min: 1, max: 12 }),
+            faker.number.int({ min: 2026, max: 2030 }),
+            faker.finance.creditCardCVV()
+        );
+        await checkoutPage.goToTheNextStep();
+        await checkoutPage.verifyOrderReviewInformation({
+            shipping: ShippingOption.NEXT_DAY_AIR,
+            payment: PaymentOption.CREDIT_CARD
+        });
+
+        await checkoutPage.confirmOrder();
         await checkoutPage.verifyCheckoutCompleted();
     });
 });
